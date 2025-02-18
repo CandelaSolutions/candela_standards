@@ -1,25 +1,20 @@
 import 'dart:io';
 
 import 'package:bitsdojo_window/bitsdojo_window.dart';
+import 'package:candela_standards/candela_standard_app_profile.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class AppState extends ChangeNotifier {}
 
-class CandelaStandardApp extends StatelessWidget {
-  final Icon icon;
-  final String text;
-  final Color primary;
-  final Color secondary;
+class CandelaStandardAppWindow extends StatelessWidget {
+  final CandelaStandardAppProfile profile;
   final Widget child;
 
-  const CandelaStandardApp({
+  const CandelaStandardAppWindow({
     super.key,
-    required this.icon,
-    required this.text,
-    required this.primary,
-    required this.secondary,
+    required this.profile,
     required this.child,
   });
 
@@ -28,17 +23,18 @@ class CandelaStandardApp extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (context) => AppState(),
       child: MaterialApp(
-        title: text,
+        title: profile.text,
         theme: ThemeData(
           useMaterial3: true,
-          colorScheme: ColorScheme.dark(primary: primary, secondary: secondary),
+          colorScheme: ColorScheme.dark(
+              primary: profile.primary, secondary: profile.secondary),
         ),
         home: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.centerLeft,
               end: Alignment.centerRight,
-              colors: [primary, secondary],
+              colors: [profile.primary, profile.secondary],
               stops: [0, 1],
             ),
           ),
@@ -54,9 +50,9 @@ class CandelaStandardApp extends StatelessWidget {
                         child: MoveWindow(
                           child: Row(
                             children: [
-                              SizedBox(width: 30, child: icon),
+                              SizedBox(width: 30, child: Icon(profile.icon)),
                               Text(
-                                text,
+                                profile.text,
                                 style: TextStyle(
                                   color: Color.fromARGB(255, 255, 255, 255),
                                   fontSize: 14,
@@ -68,7 +64,7 @@ class CandelaStandardApp extends StatelessWidget {
                           ),
                         ),
                       ),
-                      WindowButtons(primary: primary),
+                      WindowButtons(primary: profile.primary),
                     ],
                   ),
                 )

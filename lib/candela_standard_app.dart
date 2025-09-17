@@ -2,13 +2,14 @@ import 'dart:io';
 
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:candela_standards/candela_standard_app_profile.dart';
+import 'package:candela_standards/settings.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class AppState extends ChangeNotifier {}
 
-class CandelaStandardAppWindow extends StatelessWidget {
+class CandelaStandardAppWindow extends StatefulWidget {
   final CandelaStandardAppProfile profile;
   final Widget child;
 
@@ -19,22 +20,31 @@ class CandelaStandardAppWindow extends StatelessWidget {
   });
 
   @override
+  State<CandelaStandardAppWindow> createState() =>
+      _CandelaStandardAppWindowState();
+}
+
+class _CandelaStandardAppWindowState extends State<CandelaStandardAppWindow> {
+  int settingsIndex = 0;
+
+  @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (context) => AppState(),
       child: MaterialApp(
-        title: profile.text,
+        title: widget.profile.text,
         theme: ThemeData(
           useMaterial3: true,
-          colorScheme: ColorScheme.dark(
-              primary: profile.primary, secondary: profile.secondary),
+          colorScheme: ColorScheme.light(
+              primary: widget.profile.primary,
+              secondary: widget.profile.secondary),
         ),
         home: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.centerLeft,
               end: Alignment.centerRight,
-              colors: [profile.primary, profile.secondary],
+              colors: [widget.profile.primary, widget.profile.secondary],
               stops: [0, 1],
             ),
           ),
@@ -50,9 +60,14 @@ class CandelaStandardAppWindow extends StatelessWidget {
                         child: MoveWindow(
                           child: Row(
                             children: [
-                              SizedBox(width: 30, child: Icon(profile.icon)),
+                              SizedBox(
+                                  width: 30,
+                                  child: Icon(
+                                    widget.profile.icon,
+                                    color: Colors.white,
+                                  )),
                               Text(
-                                profile.text,
+                                widget.profile.text,
                                 style: TextStyle(
                                   color: Color.fromARGB(255, 255, 255, 255),
                                   fontSize: 14,
@@ -60,17 +75,27 @@ class CandelaStandardAppWindow extends StatelessWidget {
                                   fontWeight: FontWeight.normal,
                                 ),
                               ),
+                              SettingsWindowButton(
+                                primary: widget.profile.secondary,
+                                onPressed: () => setState(() {
+                                  settingsIndex = (settingsIndex + 1) % 2;
+                                }),
+                              ),
                             ],
                           ),
                         ),
                       ),
-                      WindowButtons(primary: profile.primary),
+                      WindowButtons(primary: widget.profile.primary),
                     ],
                   ),
                 )
               else if (Platform.isAndroid)
                 SizedBox(height: MediaQuery.of(context).viewPadding.top),
-              Expanded(child: child),
+              Expanded(
+                  child: IndexedStack(
+                index: settingsIndex,
+                children: [widget.child, SettingsMenu()],
+              )),
             ],
           ),
         ),
